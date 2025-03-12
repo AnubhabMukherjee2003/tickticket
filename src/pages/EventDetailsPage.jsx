@@ -18,15 +18,12 @@ const EventDetailsPage = () => {
   const [purchasing, setPurchasing] = useState(false);
 
   useEffect(() => {
-    if (contract) {
-      loadEventDetails();
-    }
+    if (contract) loadEventDetails();
   }, [contract, id]);
 
   const loadEventDetails = async () => {
     try {
       setLoading(true);
-      
       const eventData = await contract.getOccasion(id);
       const formattedEvent = {
         id: eventData.id.toNumber(),
@@ -38,23 +35,15 @@ const EventDetailsPage = () => {
         time: eventData.time,
         location: eventData.location
       };
-      
       setEvent(formattedEvent);
-      
-      // Get seats that are already taken
       const takenSeatsData = await contract.getSeatsTaken(id);
       const takenSeatsNumbers = takenSeatsData.map(seat => seat.toNumber());
       setTakenSeats(takenSeatsNumbers);
-      
-      // Create array of available seats
       const seats = [];
       for (let i = 1; i <= formattedEvent.maxTickets; i++) {
-        if (!takenSeatsNumbers.includes(i)) {
-          seats.push(i);
-        }
+        if (!takenSeatsNumbers.includes(i)) seats.push(i);
       }
       setAvailableSeats(seats);
-      
     } catch (error) {
       console.error("Error loading event details:", error);
       toast.error("Failed to load event details");
@@ -68,26 +57,17 @@ const EventDetailsPage = () => {
       toast.error("Please connect your wallet to purchase tickets");
       return;
     }
-
     if (!selectedSeat) {
       toast.error("Please select a seat to purchase");
       return;
     }
-    
     try {
       setPurchasing(true);
-      
-      const transaction = await contract.mint(id, selectedSeat, {
-        value: event.cost
-      });
-      
+      const transaction = await contract.mint(id, selectedSeat, { value: event.cost });
       toast.loading("Purchasing your ticket...");
-      
       await transaction.wait();
-      
       toast.success("Ticket purchased successfully!");
       navigate('/my-tickets');
-      
     } catch (error) {
       console.error("Error purchasing ticket:", error);
       toast.error(error.message || "Failed to purchase ticket");
@@ -109,10 +89,10 @@ const EventDetailsPage = () => {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold">Event not found</h2>
-        <p className="text-muted-foreground mt-2">The event you're looking for doesn't exist or has been removed.</p>
+        <p className="mt-2 text-gray-600">The event you're looking for doesn't exist or has been removed.</p>
         <button 
           onClick={() => navigate('/')}
-          className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+          className="mt-4 bg-indigo-600 text-white py-2 px-4 border-4 border-black shadow-[5px_5px_0px_0px_black] rounded-md transition-all hover:bg-indigo-700"
         >
           Back to Events
         </button>
@@ -121,18 +101,17 @@ const EventDetailsPage = () => {
   }
 
   return (
-    <div>
+    <div className="font-mono">
       <button
         onClick={() => navigate('/')}
         className="flex items-center text-indigo-600 hover:text-indigo-800 mb-6"
       >
         <ArrowLeft className="h-4 w-4 mr-1" /> Back to events
       </button>
-      
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* Left panel */}
+        <div className="brutalist-bg rounded-lg">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{event.name}</h1>
-          
           <div className="space-y-4 mt-6">
             <div className="flex items-center text-gray-700">
               <Calendar className="h-5 w-5 mr-3 text-indigo-600" />
@@ -151,23 +130,19 @@ const EventDetailsPage = () => {
               <span>{event.tickets} out of {event.maxTickets} tickets remaining</span>
             </div>
           </div>
-          
           <div className="mt-6 p-4 bg-gray-50 rounded-md">
             <p className="text-lg font-semibold text-gray-900">
               Cost per ticket: {ethers.utils.formatEther(event.cost)} ETH
             </p>
           </div>
         </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* Right panel */}
+        <div className="brutalist-bg rounded-lg">
           <h2 className="text-xl font-semibold mb-4">Select a Seat</h2>
-          
           {event.tickets > 0 ? (
             <>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Available Seats
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Available Seats</label>
                 <select
                   value={selectedSeat}
                   onChange={(e) => setSelectedSeat(e.target.value)}
@@ -175,13 +150,10 @@ const EventDetailsPage = () => {
                 >
                   <option value="">Select a seat</option>
                   {availableSeats.map((seat) => (
-                    <option key={seat} value={seat}>
-                      Seat {seat}
-                    </option>
+                    <option key={seat} value={seat}>Seat {seat}</option>
                   ))}
                 </select>
               </div>
-              
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Seat Map</h3>
                 <div className="grid grid-cols-5 gap-2">
@@ -190,17 +162,15 @@ const EventDetailsPage = () => {
                       key={seat}
                       className={`
                         p-2 text-center rounded cursor-pointer
-                        ${takenSeats.includes(seat) 
-                          ? 'bg-red-100 text-red-800 cursor-not-allowed' 
+                        ${takenSeats.includes(seat)
+                          ? 'bg-red-100 text-red-800 cursor-not-allowed'
                           : parseInt(selectedSeat) === seat
                             ? 'bg-green-100 text-green-800 border-2 border-green-500'
                             : 'bg-gray-100 hover:bg-indigo-100 text-gray-800'
                         }
                       `}
                       onClick={() => {
-                        if (!takenSeats.includes(seat)) {
-                          setSelectedSeat(seat.toString());
-                        }
+                        if (!takenSeats.includes(seat)) setSelectedSeat(seat.toString());
                       }}
                     >
                       {seat}
@@ -213,16 +183,15 @@ const EventDetailsPage = () => {
                   <span className="inline-block w-3 h-3 bg-green-100 mr-1 ml-3"></span>Selected
                 </p>
               </div>
-              
               {account ? (
                 <button
                   onClick={handlePurchase}
                   disabled={!selectedSeat || purchasing}
                   className={`
-                    w-full py-2 px-4 rounded-md text-white font-medium
-                    ${!selectedSeat || purchasing 
-                      ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-indigo-600 hover:bg-indigo-700'
+                    w-full py-2 px-4 rounded-md text-white font-medium transition-all
+                    ${!selectedSeat || purchasing
+                      ? 'bg-gray-300 cursor-not-allowed'
+                      : 'bg-indigo-600 hover:bg-indigo-700 border-4 border-black shadow-[5px_5px_0px_0px_black]'
                     }
                   `}
                 >
@@ -231,7 +200,7 @@ const EventDetailsPage = () => {
               ) : (
                 <button
                   onClick={connectWallet}
-                  className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md transition-all hover:bg-indigo-700 border-4 border-black shadow-[5px_5px_0px_0px_black]"
                 >
                   Connect Wallet to Purchase
                 </button>

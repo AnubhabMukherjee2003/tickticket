@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Ticket } from 'lucide-react';
 
 const CreateEvent = ({ createEvent }) => {
   const [formData, setFormData] = useState({
@@ -22,81 +21,92 @@ const CreateEvent = ({ createEvent }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold mb-6">Create New Event</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Event Name</label>
+    <div className="bg-white p-6 brutalist-card">
+      <h2 className="text-2xl font-bold mb-8 font-mono">CREATE NEW EVENT</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="brutalist-container">
           <input
             type="text"
             name="name"
+            placeholder="EVENT NAME"
             value={formData.name}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="brutalist-input smooth-type"
             required
           />
+          <label className="brutalist-label">EVENT NAME</label>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Cost (ETH)</label>
+        
+        <div className="brutalist-container">
           <input
             type="number"
             name="cost"
+            placeholder="COST IN ETH"
             value={formData.cost}
             onChange={handleChange}
             step="0.001"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="brutalist-input smooth-type"
             required
           />
+          <label className="brutalist-label">COST (ETH)</label>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Maximum Tickets</label>
+        
+        <div className="brutalist-container">
           <input
             type="number"
             name="maxTickets"
+            placeholder="MAX TICKETS"
             value={formData.maxTickets}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="brutalist-input smooth-type"
             required
           />
+          <label className="brutalist-label">MAX TICKETS</label>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Date</label>
+        
+        <div className="brutalist-container">
           <input
             type="date"
             name="date"
             value={formData.date}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="brutalist-input smooth-type"
             required
           />
+          <label className="brutalist-label">DATE</label>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Time</label>
+        
+        <div className="brutalist-container">
           <input
             type="time"
             name="time"
             value={formData.time}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="brutalist-input smooth-type"
             required
           />
+          <label className="brutalist-label">TIME</label>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Location</label>
+        
+        <div className="brutalist-container">
           <input
             type="text"
             name="location"
+            placeholder="LOCATION"
             value={formData.location}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="brutalist-input smooth-type"
             required
           />
+          <label className="brutalist-label">LOCATION</label>
         </div>
+        
         <button
           type="submit"
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
+          className="w-full font-mono text-lg py-4 mt-8 brutalist-button"
         >
-          Create Event
+          CREATE EVENT
         </button>
       </form>
     </div>

@@ -14,7 +14,7 @@ const Navigation = () => {
           <div className="flex items-center space-x-4">
             <Link to="/" className="flex items-center">
               <Ticket className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">TickTicket</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">TokenMaster</span>
             </Link>
             
             <div className="hidden md:flex space-x-4">

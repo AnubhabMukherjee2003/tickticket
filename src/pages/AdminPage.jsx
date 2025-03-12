@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { ethers } from 'ethers';
-import { Calendar, Clock, MapPin, Ticket, DollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { BlockchainContext } from '../App';
 import CreateEvent from '../components/CreateEvent';
 
@@ -19,25 +19,21 @@ const AdminPage = () => {
       navigate('/');
       return;
     }
-
     if (!isOwner) {
       toast.error("Only the contract owner can access this page");
       navigate('/');
       return;
     }
-
     loadEvents();
     loadContractBalance();
   }, [account, isOwner, contract]);
 
   const loadEvents = async () => {
     if (!contract) return;
-    
     try {
       setLoading(true);
       const totalEvents = await contract.totalOccasions();
       const eventsArray = [];
-      
       for (let i = 1; i <= totalEvents.toNumber(); i++) {
         const event = await contract.getOccasion(i);
         eventsArray.push({
@@ -51,7 +47,6 @@ const AdminPage = () => {
           location: event.location
         });
       }
-      
       setEvents(eventsArray);
     } catch (error) {
       console.error("Error loading events:", error);
@@ -63,7 +58,6 @@ const AdminPage = () => {
 
   const loadContractBalance = async () => {
     if (!contract || !provider) return;
-    
     try {
       const balance = await provider.getBalance(contract.address);
       setContractBalance(ethers.utils.formatEther(balance));
@@ -77,11 +71,9 @@ const AdminPage = () => {
       toast.error("Contract not loaded");
       return;
     }
-    
     try {
       const { name, cost, maxTickets, date, time, location } = eventData;
       const costInWei = ethers.utils.parseEther(cost.toString());
-      
       const transaction = await contract.list(
         name,
         costInWei,
@@ -90,10 +82,8 @@ const AdminPage = () => {
         time,
         location
       );
-      
       toast("Creating event...");
       await transaction.wait();
-      
       toast.success("Event created successfully!");
       loadEvents();
       loadContractBalance();
@@ -108,14 +98,11 @@ const AdminPage = () => {
       toast.error("Contract not loaded");
       return;
     }
-    
     try {
       setWithdrawing(true);
       const transaction = await contract.withdraw();
-      
       toast("Withdrawing funds...");
       await transaction.wait();
-      
       toast.success("Funds withdrawn successfully!");
       loadContractBalance();
     } catch (error) {
@@ -126,26 +113,24 @@ const AdminPage = () => {
     }
   };
 
-  if (!account || !isOwner) {
-    return null; // Navigate will handle redirecting
-  }
+  if (!account || !isOwner) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-      
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div className="container mx-auto px-4 py-8 brute-bg"> 
+      <h1 className="text-3xl font-bold mb-8 font-mono">Admin Dashboard</h1>
+
+      <div className="brutalist-bg">
         <h2 className="text-xl font-semibold mb-4">Create New Event</h2>
         <CreateEvent createEvent={createEvent} />
       </div>
-      
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+
+      <div className="brutalist-bg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Contract Balance</h2>
           <button
             onClick={withdrawFunds}
             disabled={withdrawing || parseFloat(contractBalance) === 0}
-            className="flex items-center bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:bg-gray-400"
+            className="flex items-center text-white bg-indigo-600 py-2 px-4 border-4 border-black shadow-[5px_5px_0px_0px_black] transition-all hover:bg-indigo-700 disabled:bg-gray-400 font-mono"
           >
             <DollarSign className="h-4 w-4 mr-2" />
             {withdrawing ? "Withdrawing..." : "Withdraw Funds"}
@@ -153,10 +138,9 @@ const AdminPage = () => {
         </div>
         <p className="text-2xl font-bold">{contractBalance} ETH</p>
       </div>
-      
-      <div className="bg-white rounded-lg shadow-md p-6">
+
+      <div className="brutalist-bg">
         <h2 className="text-xl font-semibold mb-4">All Events</h2>
-        
         {loading ? (
           <p className="text-center py-4">Loading events...</p>
         ) : events.length > 0 ? (
@@ -177,16 +161,10 @@ const AdminPage = () => {
                   <tr key={event.id}>
                     <td className="px-6 py-4 whitespace-nowrap">{event.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium">{event.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {event.date} at {event.time}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{event.date} at {event.time}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{event.location}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {ethers.utils.formatEther(event.cost)} ETH
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {event.tickets}/{event.maxTickets}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{ethers.utils.formatEther(event.cost)} ETH</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{event.tickets}/{event.maxTickets}</td>
                   </tr>
                 ))}
               </tbody>

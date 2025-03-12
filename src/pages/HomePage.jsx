@@ -23,7 +23,6 @@ const HomePage = () => {
       setLoadingEvents(true);
       const totalEvents = await contract.totalOccasions();
       const eventsArray = [];
-      
       for (let i = 1; i <= totalEvents.toNumber(); i++) {
         const event = await contract.getOccasion(i);
         eventsArray.push({
@@ -37,7 +36,6 @@ const HomePage = () => {
           location: event.location
         });
       }
-      
       setEvents(eventsArray);
     } catch (error) {
       console.error("Error loading events:", error);
@@ -57,13 +55,12 @@ const HomePage = () => {
   }
 
   return (
-    <div>
+    <div className="font-mono">
       <h1 className="text-3xl font-bold mb-8">Upcoming Events</h1>
-      
       {events.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event) => (
-            <div key={event.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div key={event.id} className="brutalist-bg rounded-lg overflow-hidden transition-shadow duration-300">
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900">{event.name}</h3>
                 <div className="mt-4 space-y-2">
@@ -81,19 +78,16 @@ const HomePage = () => {
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Ticket className="h-5 w-5 mr-2" />
-                    <span>
-                      {event.tickets} / {event.maxTickets} tickets available
-                    </span>
+                    <span>{event.tickets} / {event.maxTickets} tickets available</span>
                   </div>
                   <div className="mt-4">
                     <p className="text-lg font-medium text-gray-900">
                       Cost: {ethers.utils.formatEther(event.cost)} ETH
                     </p>
                   </div>
-                  
                   <Link 
                     to={`/events/${event.id}`}
-                    className="mt-4 block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
+                    className="mt-4 block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-md transition-all hover:bg-indigo-700"
                   >
                     View Details
                   </Link>
@@ -103,7 +97,7 @@ const HomePage = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-10 bg-white rounded-lg shadow">
+        <div className="brutalist-bg text-center py-10 rounded-lg">
           <Ticket className="h-16 w-16 mx-auto text-gray-400" />
           <h2 className="mt-4 text-xl font-semibold text-gray-600">No events available</h2>
           <p className="mt-2 text-gray-500">Check back later for upcoming events</p>

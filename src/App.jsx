@@ -18,11 +18,19 @@ function App() {
 
   const connectWallet = async () => {
     try {
+      if (!window.ethereum) {
+        alert("Please install MetaMask");
+        return;
+      }
+      
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts'
       });
-      setAccount(accounts[0]);
-      await setupBlockchain(accounts[0]);
+      
+      const account = accounts[0];
+      setAccount(account);
+      
+      await setupBlockchain(account);
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
@@ -30,22 +38,17 @@ function App() {
 
   const setupBlockchain = async (currentAccount) => {
     try {
-      if (!window.ethereum) return;
-      
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      setProvider(provider);
-      
       const signer = provider.getSigner();
-      setSigner(signer);
-      
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      
+      setProvider(provider);
+      setSigner(signer);
       setContract(contract);
-
+      
       // Check if connected account is the owner
-      if (currentAccount) {
-        const contractOwner = await contract.owner();
-        setIsOwner(contractOwner.toLowerCase() === currentAccount.toLowerCase());
-      }
+      const contractOwner = await contract.owner();
+      setIsOwner(contractOwner.toLowerCase() === currentAccount.toLowerCase());
       
       setLoading(false);
     } catch (error) {
@@ -55,8 +58,9 @@ function App() {
   };
 
   useEffect(() => {
+    // Check if MetaMask is installed
     if (window.ethereum) {
-      // Set up initial blockchain connection
+      // Check if already connected
       window.ethereum.request({ method: 'eth_accounts' })
         .then(accounts => {
           if (accounts.length > 0) {
@@ -65,9 +69,8 @@ function App() {
           } else {
             setLoading(false);
           }
-        })
-        .catch(console.error);
-
+        });
+      
       // Listen for account changes
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length > 0) {
@@ -81,13 +84,6 @@ function App() {
     } else {
       setLoading(false);
     }
-
-    return () => {
-      // Clean up event listeners
-      if (window.ethereum) {
-        window.ethereum.removeAllListeners('accountsChanged');
-      }
-    };
   }, []);
 
   const contextValue = {
@@ -105,10 +101,15 @@ function App() {
       <div className="min-h-screen bg-gray-100">
         <Toaster position="top-center" />
         <Navigation />
-        
-        <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <Outlet />
-        </main>
+        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-lg">Loading...</p>
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </div>
       </div>
     </BlockchainContext.Provider>
   );
